@@ -1,3 +1,4 @@
+require 'bcrypt'
 class TopController < ApplicationController
     def main
         if session[:login_uid]
@@ -8,9 +9,13 @@ class TopController < ApplicationController
     end
     
     def login
-        if params[:uid]=='kindai' and params[:pass]=='sanriko'
-            session[:login_uid]=params[:uid]
-            redirect_to root_path
+   
+        if User.find_by(uid: params[:uid])
+             signup_password = BCrypt::Password.create(params[:pass])
+            if BCrypt::Password.new(signup_password) == params[:pass]
+                session[:login_uid]=params[:uid]
+                redirect_to root_path
+            end
         else 
             render 'login_failed'
         end
